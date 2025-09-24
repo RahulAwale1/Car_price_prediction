@@ -6,6 +6,7 @@ app = FastAPI(title="Car Price Prediction API")
 
 # Define input schema (minimal example – add more fields as needed)
 class CarFeatures(BaseModel):
+    CarName: str
     symboling: int
     wheelbase: float
     carwidth: float
@@ -16,6 +17,8 @@ class CarFeatures(BaseModel):
     fueltype: str
     aspiration: str
     carbody: str
+    drivewheel: str
+    enginesize: int
 
 @app.get("/")
 def root():

@@ -2,8 +2,18 @@ import joblib
 import pandas as pd
 
 # Load artifacts
-model = joblib.load("model.pkl")
-columns = joblib.load("columns.pkl")
+pipeline = joblib.load("car_price_pipeline.pkl")
+
+def clean_brand(name: str) -> str:
+    brand = name.split(" ")[0].lower()
+    corrections = {
+        "maxda": "mazda",
+        "porcshce": "porsche",
+        "toyouta": "toyota",
+        "vokswagen": "volkswagen",
+        "vw": "volkswagen"
+    }
+    return corrections.get(brand, brand)
 
 def predict(input_dict: dict):
     """
@@ -13,9 +23,9 @@ def predict(input_dict: dict):
     # Convert dict → dataframe
     df = pd.DataFrame([input_dict])
 
-    # Align columns (so API input matches training schema)
-    df = pd.get_dummies(df)
-    df = df.reindex(columns=columns, fill_value=0)
+    if "CarName" in df.columns:
+        df["brand"] = df["CarName"].apply(clean_brand)
+        df = df.drop(columns=["CarName"])
 
-    prediction = model.predict(df)[0]
+    prediction = pipeline.predict(df)[0]
     return float(prediction)
